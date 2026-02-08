@@ -1,24 +1,17 @@
 from rest_framework import viewsets
-from rest_framework.permissions import AllowAny
+from rest_framework.permissions import AllowAny, IsAuthenticated
 from django.contrib.auth.models import User
 from django.utils.dateparse import parse_datetime
 from .models import Group, Expense
 from .serializers import GroupSerializer, ExpenseSerializer, UserSerializer
 
 class SyncMixin:
-    """
-    Klasa dodająca logikę synchronizacji (last_sync) i miękkiego usuwania.
-    """
-    def get_queryset(self):
-
-        queryset = super().get_queryset()
-
+    def filter_for_sync(self, queryset):
         last_sync = self.request.query_params.get('last_sync')
         if last_sync:
             date = parse_datetime(last_sync)
             if date:
                 queryset = queryset.filter(updated_at__gt=date)
-        
         return queryset
 
     def perform_destroy(self, instance):
@@ -31,23 +24,28 @@ class UserViewSet(viewsets.ModelViewSet):
     serializer_class = UserSerializer
     permission_classes = [AllowAny]
 
+
 class GroupViewSet(SyncMixin, viewsets.ModelViewSet):
-    """
-    Widok Grup z obsługą synchronizacji.
-    """
-    queryset = Group.objects.all()
     serializer_class = GroupSerializer
+    permission_classes = [IsAuthenticated]
+
+    def get_queryset(self):
+        queryset = Group.objects.filter(members=self.request.user)
+        
+        return self.filter_for_sync(queryset)
 
     def perform_create(self, serializer):
         group = serializer.save()
         group.members.add(self.request.user)
 
+
 class ExpenseViewSet(SyncMixin, viewsets.ModelViewSet):
-    """
-    Widok Wydatków z obsługą synchronizacji.
-    """
-    queryset = Expense.objects.all()
     serializer_class = ExpenseSerializer
+    permission_classes = [IsAuthenticated]
+
+    def get_queryset(self):
+        queryset = Expense.objects.filter(group__members=self.request.user)
+        return self.filter_for_sync(queryset)
 
     def perform_create(self, serializer):
         serializer.save(person_paying=self.request.user)
