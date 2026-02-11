@@ -32,7 +32,7 @@ This full-stack application provides a complete solution for managing group expe
 - Centralized API client with request/response interceptors
 - Automatic Authorization header injection (Token-based)
 - Error handling and logging
-- Base URL: `http://192.168.0.146:8000/api/`
+- Base URL: `http://{server_ip}:8000/api/`
 
 ### Project Structure
 ```
@@ -316,7 +316,7 @@ typescript==5.1.0
 
 #### 1. Navigate to Project
 ```bash
-cd /Users/jakub/zespolowy
+cd /Users/username/project_name
 ```
 
 #### 2. Create & Activate Virtual Environment
@@ -343,9 +343,9 @@ python manage.py createsuperuser
 
 #### 6. Start Development Server
 ```bash
-python manage.py runserver
+python manage.py runserver 0.0.0.0:8000
 ```
-Server available at: `http://127.0.0.1:8000`
+Server available at: `http://{your_ip}:8000`
 
 ### Frontend Installation
 
