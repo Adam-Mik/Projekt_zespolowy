@@ -1,111 +1,66 @@
-# Expense Sharing Backend API
+# Expense Sharing Application
 
-A Django REST Framework-based backend for managing shared expenses within groups. This API provides real-time synchronization capabilities for mobile clients, enabling groups to track and split expenses efficiently.
+A comprehensive expense tracking and management system built with React Native (Expo) frontend and Django REST Framework backend. This application enables groups to track shared expenses efficiently with real-time synchronization capabilities.
 
-## Overview
+## Project Overview
 
-This project implements a comprehensive expense management system with features like group management, expense tracking, and mobile-optimized data synchronization. The backend is designed to support multiple clients with consistent state management through soft-delete mechanisms and timestamp-based sync filtering.
+This full-stack application provides a complete solution for managing group expenses with:
+- **Frontend**: React Native mobile app with TypeScript
+- **Backend**: Django REST Framework API with token-based authentication
+- **Features**: User authentication, group management, expense tracking, and real-time data synchronization
 
-## Key Features
+---
 
-### 🔄 Real-Time Synchronization
-- **Timestamp-based sync**: Query expenses with `last_sync` parameter to fetch only changed records
-- **Soft delete support**: Deleted items remain queryable with `is_deleted=true` status for mobile device consistency
-- **Automatic timestamps**: All entities track `updated_at` for data consistency
+## Frontend Application
 
-### 👥 Group Management
-- Create and manage expense-sharing groups
-- Multiple group members (Many-to-Many relationships)
-- Member-based access control (users only see their groups)
+### Technology Stack
+- **Framework**: React Native with Expo
+- **Language**: TypeScript
+- **HTTP Client**: Axios with interceptors
+- **Storage**: AsyncStorage for local data and token persistence
+- **Navigation**: React Navigation (bottom tab navigation)
 
-### 💰 Expense Tracking
-- Track individual expenses within groups
-- Record who paid for the expense
-- Store descriptions and amounts
-- Automatic timestamps on creation and modification
+### Features
 
-### 🔐 Security & Authentication
-- Token-based authentication (Django Token Auth)
-- Permission-based access control
-- Isolated data views (users see only their own groups and expenses)
-- Role validation for API endpoints
+#### 1. **Authentication System**
+- Login/Register screen with username and password
+- Token-based authentication stored securely in AsyncStorage
+- Automatic token refresh on app launch
+- Logout functionality with complete session cleanup
 
-## Tech Stack
+### API Integration
+- Centralized API client with request/response interceptors
+- Automatic Authorization header injection (Token-based)
+- Error handling and logging
+- Base URL: `http://192.168.0.146:8000/api/`
 
-- **Framework**: Django 5.2.7
-- **API**: Django REST Framework (DRF)
-- **Database**: SQLite3 (development) / PostgreSQL (production-ready)
-- **Authentication**: Django Token Authentication
-- **Language**: Python 3.x
-
-## Project Structure
-
+### Project Structure
 ```
-Projekt_zespolowy/
-├── Backend/                    # Main Django app
-│   ├── models.py              # Database models (Group, Expense)
-│   ├── views.py               # API ViewSets with sync logic
-│   ├── serializers.py         # DRF serializers
-│   ├── test_sync.py           # Synchronization test suite
-│   ├── test_security.py       # Security validation tests
-│   ├── admin.py               # Django admin configuration
-│   └── migrations/            # Database migrations
-│
-├── core/                       # Django project configuration
-│   ├── settings.py            # Project settings
-│   ├── urls.py                # URL routing
-│   ├── wsgi.py                # WSGI configuration
-│   └── asgi.py                # ASGI configuration
-│
-├── manage.py                  # Django management script
-└── db.sqlite3                 # Database file
-
+myApp/
+├── src/
+│   ├── api/
+│   │   └── client.ts           # Axios configuration & API functions
+│   ├── components/
+│   │   └── Card.tsx            # Reusable card component
+│   ├── screens/
+│   │   ├── LoginScreen.tsx      # Authentication interface
+│   │   ├── DashboardScreen.tsx  # Main expense tracking
+│   │   ├── CalculatorScreen.tsx # Expense calculator
+│   │   └── ArchiveScreen.tsx    # Historical expenses
+│   ├── App.tsx                 # Main app entry & navigation
+│   └── index.ts                # App exports
+├── app.json                    # Expo configuration
+├── package.json                # Dependencies
+└── tsconfig.json              # TypeScript configuration
 ```
 
-## Installation & Setup
+---
 
-### Prerequisites
-- Python 3.8+
-- pip (Python package manager)
-
-### 1. Clone & Navigate to Project
-```bash
-cd Projekt_zespolowy
-```
-
-### 2. Create Virtual Environment
-```bash
-python -m venv venv
-venv\Scripts\activate  # On Windows
-source venv/bin/activate  # On macOS/Linux
-```
-
-### 3. Install Dependencies
-```bash
-pip install django djangorestframework
-```
-
-### 4. Run Migrations
-```bash
-python manage.py migrate
-```
-
-### 5. Create Superuser (Optional - for Admin Panel)
-```bash
-python manage.py createsuperuser
-```
-
-### 6. Start Development Server
-```bash
-python manage.py runserver
-```
-Server will be available at: `http://127.0.0.1:8000`
-
-## API Documentation
+## Backend API
 
 ### Base URL
 ```
-http://127.0.0.1:8000/api/
+http://192.168.0.146:8000/api/
 ```
 
 ### Authentication
@@ -114,13 +69,13 @@ All protected endpoints require a token header:
 Authorization: Token <your_token_here>
 ```
 
----
+### API Endpoints
 
-### User Management
+#### **User Management**
 
-#### Register User
+**Register User**
 ```http
-POST /users/
+POST /api/users/
 Content-Type: application/json
 
 {
@@ -136,7 +91,7 @@ Content-Type: application/json
 }
 ```
 
-#### Login
+**Login**
 ```http
 POST /api/login/
 Content-Type: application/json
@@ -153,11 +108,9 @@ Content-Type: application/json
 }
 ```
 
----
+#### **Group Management**
 
-### Group Management
-
-#### List User's Groups
+**List User's Groups**
 ```http
 GET /api/groups/
 Authorization: Token <token>
@@ -178,7 +131,7 @@ Authorization: Token <token>
 ]
 ```
 
-#### Create Group
+**Create Group**
 ```http
 POST /api/groups/
 Authorization: Token <token>
@@ -199,30 +152,28 @@ Content-Type: application/json
 }
 ```
 
-#### Get Group Details
+**Get Group Details**
 ```http
 GET /api/groups/{group_id}/
 Authorization: Token <token>
 ```
 
-#### Update Group
+**Update Group**
 ```http
 PUT /api/groups/{group_id}/
 PATCH /api/groups/{group_id}/
 Authorization: Token <token>
 ```
 
-#### Delete Group (Soft Delete)
+**Delete Group (Soft Delete)**
 ```http
 DELETE /api/groups/{group_id}/
 Authorization: Token <token>
 ```
 
----
+#### **Expense Management**
 
-### Expense Management
-
-#### List Expenses (with Sync)
+**List Expenses (with Sync)**
 ```http
 GET /api/expenses/
 Authorization: Token <token>
@@ -247,7 +198,7 @@ Authorization: Token <token>
 ]
 ```
 
-#### Create Expense
+**Create Expense**
 ```http
 POST /api/expenses/
 Authorization: Token <token>
@@ -263,20 +214,20 @@ Content-Type: application/json
 **Response (201 Created)**
 - `person_paying` is automatically set to the authenticated user
 
-#### Get Expense Details
+**Get Expense Details**
 ```http
 GET /api/expenses/{expense_id}/
 Authorization: Token <token>
 ```
 
-#### Update Expense
+**Update Expense**
 ```http
 PUT /api/expenses/{expense_id}/
 PATCH /api/expenses/{expense_id}/
 Authorization: Token <token>
 ```
 
-#### Delete Expense (Soft Delete)
+**Delete Expense (Soft Delete)**
 ```http
 DELETE /api/expenses/{expense_id}/
 Authorization: Token <token>
@@ -284,11 +235,9 @@ Authorization: Token <token>
 - Sets `is_deleted=true` instead of physically deleting the record
 - Record remains queryable via sync endpoints
 
----
+### Architecture & Design Patterns
 
-## Architecture & Design Patterns
-
-### SyncMixin
+#### SyncMixin
 A reusable mixin that provides synchronization capabilities:
 ```python
 class SyncMixin:
@@ -299,17 +248,132 @@ class SyncMixin:
         """Implements soft delete instead of hard delete"""
 ```
 
-### ViewSet Architecture
+#### ViewSet Architecture
 Each resource (User, Group, Expense) uses Django REST Framework ViewSets:
 - **UserViewSet**: Full CRUD, AllowAny permission
 - **GroupViewSet**: Full CRUD, IsAuthenticated, member-filtered
 - **ExpenseViewSet**: Full CRUD, IsAuthenticated, member-group-filtered
 
-### Authentication Flow
-1. User registers via `/users/` endpoint
-2. User logs in via `/api/login/` to receive token
-3. Token included in subsequent requests via `Authorization` header
-4. Django Token Auth validates all protected endpoints
+### Data Synchronization Strategy
+
+#### Sync Flow for Mobile Clients
+1. **First sync**: Client sends initial timestamp
+2. **Query**: `GET /api/expenses/?last_sync=2024-01-15T10:00:00Z`
+3. **Response**: All items modified after the given timestamp
+4. **Deleted items**: Included with `is_deleted=true`
+5. **Client action**: Updates or removes local items accordingly
+
+### Security Features
+
+#### ✅ Implemented
+- Token-based authentication (stateless)
+- Permission-based access control
+- User isolation (users see only their own data)
+- Soft deletes prevent accidental data loss
+- CSRF protection via Django middleware
+- Password hashing with Django's auth system
+
+---
+
+## Requirements
+
+### System Requirements
+- **Python**: 3.8 or higher
+- **Node.js**: 14.0 or higher
+- **NPM/Yarn**: Latest stable version
+- **Expo CLI**: Latest version
+
+### Backend Dependencies
+```
+Django==5.2.7
+djangorestframework==3.14.0
+python-dotenv==0.21.0
+```
+
+### Frontend Dependencies
+```
+react==18.2.0
+react-native==0.72.0
+expo==49.0.0
+@react-navigation/native==6.1.0
+@react-navigation/bottom-tabs==6.5.0
+axios==1.4.0
+react-native-async-storage==1.17.0
+@expo/vector-icons==13.0.0
+typescript==5.1.0
+```
+
+### Development Tools
+- **Backend**: Django Development Server
+- **Frontend**: Expo Go (iOS/Android testing)
+- **Database**: SQLite3 (development) / PostgreSQL (production)
+
+---
+
+## Installation & Setup
+
+### Backend Installation
+
+#### 1. Navigate to Project
+```bash
+cd /Users/jakub/zespolowy
+```
+
+#### 2. Create & Activate Virtual Environment
+```bash
+python -m venv venv
+source venv/bin/activate  # On macOS/Linux
+venv\Scripts\activate     # On Windows
+```
+
+#### 3. Install Dependencies
+```bash
+pip install -r requirements.txt
+```
+
+#### 4. Run Migrations
+```bash
+python manage.py migrate
+```
+
+#### 5. Create Superuser (Optional)
+```bash
+python manage.py createsuperuser
+```
+
+#### 6. Start Development Server
+```bash
+python manage.py runserver
+```
+Server available at: `http://127.0.0.1:8000`
+
+### Frontend Installation
+
+#### 1. Navigate to Frontend Directory
+```bash
+cd myApp
+```
+
+#### 2. Install Dependencies
+```bash
+npm install
+# or
+yarn install
+```
+
+#### 3. Start Expo Development Server
+```bash
+npm start
+# or
+expo start
+```
+
+#### 4. Run on Device/Emulator
+- **iOS**: Press `i` in Expo CLI
+- **Android**: Press `a` in Expo CLI
+- **Web**: Press `w` in Expo CLI
+
+---
 
 ## Testing
 
@@ -334,140 +398,46 @@ Validates security implementation:
 2. Group visibility restrictions
 3. Direct ID access prevention (404 for unauthorized users)
 
-## Data Synchronization Strategy
+---
 
-### Sync Flow for Mobile Clients
-1. **First sync**: Client sends initial timestamp
-2. **Query**: `GET /api/expenses/?last_sync=2024-01-15T10:00:00Z`
-3. **Response**: All items modified after the given timestamp
-4. **Deleted items**: Included with `is_deleted=true`
-5. **Client action**: Updates or removes local items accordingly
+## Project Structure
 
-### Example Sync Response
-```json
-[
-  {
-    "id": "uuid-1",
-    "name": "Pizza",
-    "updated_at": "2024-01-15T10:05:00Z",
-    "is_deleted": false
-  },
-  {
-    "id": "uuid-2",
-    "name": "Old Expense",
-    "updated_at": "2024-01-15T10:10:00Z",
-    "is_deleted": true
-  }
-]
 ```
-Mobile client:
-- Updates or inserts item 1
-- Deletes item 2 locally
-
-## Security Features
-
-### ✅ Implemented
-- Token-based authentication (stateless)
-- Permission-based access control
-- User isolation (users see only their own data)
-- Soft deletes prevent accidental data loss
-- CSRF protection via Django middleware
-- Password hashing with Django's auth system
-
-### Query Filtering
-- Groups: Filtered by `members=current_user`
-- Expenses: Filtered by `group__members=current_user`
-- Direct ID access returns 404 if user not in group
-
-## Development Guidelines
-
-### Adding New Endpoints
-```python
-class NewViewSet(SyncMixin, viewsets.ModelViewSet):
-    serializer_class = YourSerializer
-    permission_classes = [IsAuthenticated]
-    
-    def get_queryset(self):
-        # Filter data specific to current user
-        queryset = YourModel.objects.filter(owner=self.request.user)
-        return self.filter_for_sync(queryset)
+/
+├── Backend/                    # Django REST API
+│   ├── models.py              # Database models
+│   ├── views.py               # API ViewSets
+│   ├── serializers.py         # DRF serializers
+│   ├── test_sync.py           # Sync tests
+│   ├── test_security.py       # Security tests
+│   ├── admin.py               # Django admin
+│   └── migrations/            # Database migrations
+│
+├── core/                       # Django configuration
+│   ├── settings.py            # Settings
+│   ├── urls.py                # URL routing
+│   ├── wsgi.py                # WSGI config
+│   └── asgi.py                # ASGI config
+│
+├── myApp/                      # React Native Frontend
+│   ├── src/
+│   │   ├── api/               # API client
+│   │   ├── components/        # Reusable components
+│   │   ├── screens/           # App screens
+│   │   └── App.tsx            # Main app
+│   ├── app.json               # Expo config
+│   ├── package.json           # Dependencies
+│   └── tsconfig.json          # TypeScript config
+│
+├── manage.py                  # Django CLI
+├── db.sqlite3                 # Database
+├── package.json               # Root dependencies
+└── README.md                  # This file
 ```
 
-### Database Query Examples
-```python
-# Get user's groups
-user.my_groups.all()
+## Authors
 
-# Get expenses in a specific group
-group.expenses.all()
+- Jakub Pająk 64814
+- Adam Mik
+- Mateusz Jachimowski
 
-# Get items modified after timestamp
-Group.objects.filter(updated_at__gt=datetime_object)
-```
-
-## Configuration
-
-### Settings File (`core/settings.py`)
-Key configurations:
-```python
-INSTALLED_APPS = [
-    'rest_framework',
-    'rest_framework.authtoken',
-    'Backend',
-]
-
-REST_FRAMEWORK = {
-    'DEFAULT_AUTHENTICATION_CLASSES': [
-        'rest_framework.authentication.TokenAuthentication',
-    ],
-    'DEFAULT_PERMISSION_CLASSES': [
-        'rest_framework.permissions.IsAuthenticated',
-    ]
-}
-```
-
-## Troubleshooting
-
-### 401 Unauthorized
-- Missing or invalid token in request header
-- **Solution**: Ensure `Authorization: Token <token>` header is present
-
-### 404 Not Found
-- Accessing resource you don't have permission for
-- Resource doesn't exist
-- **Solution**: Verify group/expense ownership
-
-### 400 Bad Request
-- Invalid JSON payload
-- Missing required fields
-- **Solution**: Check request body format and required fields
-
-### Sync not returning changes
-- Ensure timestamp format is ISO 8601: `2024-01-15T10:30:00Z`
-- Check that items have `updated_at` after `last_sync` time
-- **Solution**: Verify timestamp comparison in filters
-
-## Production Considerations
-
-1. **Database**: Switch from SQLite to PostgreSQL
-2. **Debug Mode**: Set `DEBUG=False` in settings
-3. **Secret Key**: Use environment variable for Django SECRET_KEY
-4. **ALLOWED_HOSTS**: Configure allowed domains
-5. **CORS**: Install and configure django-cors-headers if needed
-6. **SSL**: Enable HTTPS in production
-7. **Logging**: Configure proper logging
-8. **Backups**: Implement database backup strategy
-
-## License
-
-[Specify your license here]
-
-## Contributing
-
-[Add contribution guidelines if applicable]
-
-## Support
-
-For issues or questions, please refer to the test files for usage examples:
-- `Backend/test_sync.py` - Synchronization examples
-- `Backend/test_security.py` - Security validation examples
